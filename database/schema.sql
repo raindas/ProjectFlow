@@ -1,0 +1,36 @@
+CREATE TYPE TaskStatus AS ENUM ('Pending', 'InProgress', 'Completed', 'Cancelled');
+
+CREATE TABLE Settings (
+    OwnerID UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    OwnerEmail VARCHAR(255) UNIQUE NOT NULL,
+    UpcomingMinutes INT DEFAULT 60,
+    TimeZone VARCHAR(50) DEFAULT 'Africa/Lagos',
+    DailyDigestTime TIME DEFAULT '08:00',
+    EmailEnabled BOOLEAN DEFAULT TRUE,
+    ReminderEnabled BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE Projects (
+    ProjectID UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    OwnerID UUID REFERENCES Settings(OwnerID),
+    ProjectName VARCHAR(255) NOT NULL,
+    CreatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    DeletedAt TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE Tasks (
+    TaskID UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    ProjectID UUID REFERENCES Projects(ProjectID) ON DELETE CASCADE,
+    TaskTitle VARCHAR(255) NOT NULL,
+    DueDate TIMESTAMP WITH TIME ZONE,
+    Status TaskStatus DEFAULT 'Pending',
+    Location VARCHAR(255),
+    AssignedEmail VARCHAR(255) NOT NULL,
+    NotifiedUpcomingAt TIMESTAMP WITH TIME ZONE,
+    NotifiedOverdueAt TIMESTAMP WITH TIME ZONE,
+    EventID VARCHAR(255),
+    CreatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    DeletedAt TIMESTAMP WITH TIME ZONE
+);

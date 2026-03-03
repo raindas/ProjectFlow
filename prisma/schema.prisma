@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Settings {
+  OwnerID          String     @id @default(uuid()) @db.Uuid
+  OwnerEmail       String     @unique
+  UpcomingMinutes  Int        @default(60)
+  TimeZone         String     @default("Africa/Lagos")
+  DailyDigestTime  String     @default("08:00")
+  EmailEnabled     Boolean    @default(true)
+  ReminderEnabled  Boolean    @default(true)
+  LastDigestSentAt DateTime?  @db.Date
+  Projects         Projects[]
+}
+
+model Projects {
+  ProjectID   String    @id @default(uuid()) @db.Uuid
+  OwnerID     String    @db.Uuid
+  ProjectName String
+  CreatedAt   DateTime  @default(now())
+  UpdatedAt   DateTime  @updatedAt
+  DeletedAt   DateTime?
+  Owner       Settings  @relation(fields: [OwnerID], references: [OwnerID])
+  Tasks       Tasks[]
+}
+
+model Tasks {
+  TaskID             String     @id @default(uuid()) @db.Uuid
+  ProjectID          String     @db.Uuid
+  TaskTitle          String
+  DueDate            DateTime?
+  Status             TaskStatus @default(Pending)
+  Location           String?
+  AssignedEmail      String
+  NotifiedUpcomingAt DateTime?
+  NotifiedOverdueAt  DateTime?
+  EventID            String?
+  CreatedAt          DateTime   @default(now())
+  UpdatedAt          DateTime   @updatedAt
+  DeletedAt          DateTime?
+  Project            Projects   @relation(fields: [ProjectID], references: [ProjectID], onDelete: Cascade)
+}
+
+enum TaskStatus {
+  Pending
+  InProgress
+  Completed
+  Cancelled
+}
