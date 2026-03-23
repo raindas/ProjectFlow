@@ -6,7 +6,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await fetch('http://localhost:3000/api/v1/auth/login', {
+    await fetch(`${import.meta.env.VITE_BASE_BACKEND_URL}/api/v1/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email })
